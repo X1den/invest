@@ -47,6 +47,15 @@ function renderMath() {
   });
 }
 
+document.querySelectorAll('textarea').forEach(textarea => {
+  textarea.addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = (this.scrollHeight) + 'px';
+  });
+  
+  textarea.style.height = (textarea.scrollHeight) + 'px';
+});
+
 function goToSlide(index) {
   Reveal.slide(index);
 }
@@ -143,21 +152,26 @@ function parseMatrixInput(text) {
 }
 
 function matrixToString(m) { 
-    return m.map(r => r.join('\t')).join('\n'); 
+    const rows = m.map(row => row.join(' & ')).join(' \\\\ ');
+    return `\\begin{pmatrix} ${rows} \\end{pmatrix}`;
 }
 
 function calculateSum() {
     const A = parseMatrixInput(document.getElementById('matrixA-add').value);
     const B = parseMatrixInput(document.getElementById('matrixB-add').value);
     const res = MatrixOperations.addMatrices(A, B);
-    document.getElementById('sum-result').innerHTML = `<pre>${matrixToString(res)}</pre>`;
+    const latex = matrixToString(res);
+    document.getElementById('sum-result').innerHTML = `<div class="katex-result">$$${latex}$$</div>`;
+    renderMathInElement(document.getElementById('sum-result'));
 }
 
 function calculateMultiply() {
     const A = parseMatrixInput(document.getElementById('matrixA-mult').value);
     const B = parseMatrixInput(document.getElementById('matrixB-mult').value);
     const res = MatrixOperations.multiplyMatrices(A, B);
-    document.getElementById('mult-result').innerHTML = `<pre>${matrixToString(res)}</pre>`;
+    const latex = matrixToString(res);
+    document.getElementById('mult-result').innerHTML = `<div class="katex-result">$$${latex}$$</div>`;
+    renderMathInElement(document.getElementById('mult-result'));
 
 }
 
@@ -167,6 +181,6 @@ function calculateDeterminant() {
     if (m.length === 2) res = MatrixOperations.determinant2x2(m);
     else if (m.length === 3) res = MatrixOperations.determinant3x3(m);
     else if (m.length === 4) res = MatrixOperations.determinant4x4(m);
-    else throw new Error('Поддерживаются только 2×2, 3×3, 4×4');
-    document.getElementById('det-result').innerHTML = `<div class="det-value">det = ${res}</div>`;
+    document.getElementById('det-result').innerHTML = `<div class="det-value">$$ \\det = ${res} $$</div>`;
+    renderMathInElement(document.getElementById('det-result'));
 }
